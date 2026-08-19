@@ -1,0 +1,43 @@
+<h1>Cycle counts</h1>
+<p class="lede">
+  A physical count is not an edit. It is recorded as its own record, and reconciling it
+  writes exactly one adjustment movement, keyed on the count's id. Posting the same count
+  again, or retrying the job after a timeout that actually succeeded, adjusts nothing a
+  second time. That double-post is how a store ends up forty bottles up on paper.
+</p>
+
+<h2>Record a count</h2>
+<%= form_with url: counts_path, method: :post, class: "inline" do %>
+  <div class="row">
+    <label>SKU</label>
+    <%= select_tag :sku_id, options_from_collection_for_select(@skus, :id, :name) %>
+  </div>
+  <div class="row">
+    <label>Location</label>
+    <%= select_tag :location_id, options_from_collection_for_select(@locations, :id, :name) %>
+  </div>
+  <div class="row"><label>Counted</label><%= number_field_tag :counted, 0, min: 0 %></div>
+  <div class="row"><label>Counted by</label><%= text_field_tag :counted_by, "floor staff" %></div>
+  <button>Record and queue reconciliation</button>
+<% end %>
+
+<h2>Recent counts</h2>
+<table>
+  <tr><th>When</th><th>SKU</th><th>Location</th><th class="num">Counted</th>
+      <th class="num">Variance</th><th>Status</th><th>By</th><th></th></tr>
+  <% @counts.each do |c| %>
+    <tr>
+      <td><%= c.counted_at.strftime("%Y-%m-%d %H:%M") %></td>
+      <td><%= link_to c.sku.code, sku_path(c.sku.code) %></td>
+      <td><%= c.location.code %></td>
+      <td class="num"><%= c.counted %></td>
+      <td class="num <%= "neg" if c.variance.to_i.negative? %>"><%= c.variance %></td>
+      <td><span class="pill <%= c.status %>"><%= c.status %></span></td>
+      <td><%= c.counted_by %></td>
+      <td>
+        <%= button_to "Post again", post_count_path(c), form: { style: "display:inline" },
+                      style: "margin:0;padding:3px 9px;font-size:12px" %>
+      </td>
+    </tr>
+  <% end %>
+</table>

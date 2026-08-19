@@ -1,0 +1,37 @@
+<h1>On hand, derived</h1>
+<p class="lede">
+  Backbar tracks stock for a multi-store retailer as an append-only ledger of movements:
+  receipts, sales, transfers, shrink, adjustments. Every number on this page is a
+  <code>SUM(quantity)</code> over that ledger. There is no quantity column to drift, and
+  every write carries an idempotency key so a retried scanner or a replayed point-of-sale
+  message cannot move the same case twice.
+</p>
+
+<div class="invariant">
+  <b>Ledger:</b> <%= @ledger_total %> units across <%= @skus.size %> SKUs and
+  <%= @locations.size %> locations.
+  <b>Negative cells:</b> <%= @negatives %>
+  <%= @negatives.zero? ? "&#10003;".html_safe : "" %>.
+  <b>Counts awaiting reconciliation:</b> <%= @pending %>.
+</div>
+
+<h2>Board</h2>
+<table class="grid">
+  <tr>
+    <th>SKU</th><th>Item</th>
+    <% @locations.each do |l| %><th class="num"><%= l.name %></th><% end %>
+    <th class="num">Total</th>
+  </tr>
+  <% @skus.each do |s| %>
+    <tr>
+      <td><%= link_to s.code, sku_path(s.code) %></td>
+      <td><%= s.name %></td>
+      <% total = 0 %>
+      <% @locations.each do |l| %>
+        <% v = @grid[[s.id, l.id]]; total += v %>
+        <td class="num <%= v.zero? ? 'zero' : (v.negative? ? 'neg' : '') %>"><%= qty(v) %></td>
+      <% end %>
+      <td class="num"><b><%= total %></b></td>
+    </tr>
+  <% end %>
+</table>

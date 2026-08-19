@@ -1,0 +1,31 @@
+<h1><%= @sku.name %> <span style="color:#5b666f;font-size:15px">(<%= @sku.code %>)</span></h1>
+<p class="lede">
+  Every row below is a fact that was written once and never edited. The on-hand figures
+  are the sum of these rows and are computed at read time.
+</p>
+
+<div class="cards">
+  <% @locations.each do |l| %>
+    <div class="card">
+      <div class="code"><%= l.code %></div>
+      <div class="amt"><%= @by_location.fetch(l.id, 0) %></div>
+      <div><%= l.name %></div>
+    </div>
+  <% end %>
+</div>
+
+<h2>Movements</h2>
+<table>
+  <tr><th>Occurred</th><th>Location</th><th>Kind</th><th class="num">Qty</th>
+      <th>Idempotency key</th><th>Note</th></tr>
+  <% @movements.each do |m| %>
+    <tr>
+      <td><%= m.occurred_at.strftime("%Y-%m-%d %H:%M") %></td>
+      <td><%= m.location.code %></td>
+      <td><span class="pill"><%= m.kind %></span></td>
+      <td class="num <%= "neg" if m.quantity.negative? %>"><%= m.quantity %></td>
+      <td style="font-size:12px;color:#5b666f"><%= m.idempotency_key %></td>
+      <td style="font-size:13px"><%= m.note %></td>
+    </tr>
+  <% end %>
+</table>

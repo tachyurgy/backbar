@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Backbar</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %><%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="/">Backbar</a>
+      <span class="sub">movement-ledger inventory for multi-store retail</span>
+      <nav><%= link_to "Board", root_path %><%= link_to "Cycle counts", counts_path %></nav>
+    </header>
+    <% if flash[:notice] %><p class="flash ok"><%= flash[:notice] %></p><% end %>
+    <% if flash[:alert] %><p class="flash bad"><%= flash[:alert] %></p><% end %>
+    <main><%= yield %></main>
+    <footer>
+      Rails <%= Rails.version %>, PostgreSQL, Hotwire, Solid Queue. On-hand is derived
+      from the movement ledger on every read; there is no quantity column.
+      <a href="https://github.com/tachyurgy/backbar">Source</a>
+    </footer>
+  </body>
+</html>
